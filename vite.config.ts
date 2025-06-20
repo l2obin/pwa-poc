@@ -52,4 +52,16 @@ export default defineConfig({
     }),
     mkcert()
   ],
+  server: {
+    // For OPFS to work, will need the following header
+    // 'Cross-Origin-Opener-Policy': 'same-origin'
+    // 'Cross-Origin-Embedder-Policy': 'require-corp',
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
+  },
+  optimizeDeps: {
+    exclude: ['@sqlite.org/sqlite-wasm'],
+  },
 })

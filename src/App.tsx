@@ -1,9 +1,20 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import './App.css'
+import SqliteConsole from './sqlite-test/sqlite-console'
 
 function App() {
   const [count, setCount] = useState(0)
+
+  let runFirst = false
+  // Run once only for worker
+  if (!runFirst) {
+    runFirst = true
+    // const worker = new Worker('/worker.js', { type: 'module' });
+    // worker.onmessage = (e) => {  
+    //   e.data.type === 'log' ? console.log(e.data.payload) : console.error(e.data.payload);  
+    // };
+  }
 
   return (
     <>
@@ -24,6 +35,8 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
+
+      <SqliteConsole />
     </>
   )
 }
