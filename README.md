@@ -1,4 +1,8 @@
-# React + TypeScript + Vite
+# React + TypeScript + Vite + PWA + SQLite (via OPFS)
+
+This template provides a minimal setup for a React application using TypeScript, Vite, and Progressive Web App (PWA) features, with SQLite support via the Origin Private File System (OPFS).
+
+---
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
