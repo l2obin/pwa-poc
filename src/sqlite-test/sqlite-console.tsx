@@ -1,11 +1,10 @@
 import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm';
 
-import { useState } from 'react';
-
 function SqliteConsole() {
-  const [count, setCount] = useState(0);
+  // Initialize the SQLite3 worker and run a demo trigger by a button click
+  // This is a self-invoking async function to handle the asynchronous nature of the SQLite3 worker 
 
-  (async () => {
+  const callDatabase = async () => {
     try {
       console.log('Loading and initializing SQLite3 module...');
   
@@ -37,7 +36,7 @@ function SqliteConsole() {
       console.log('Creating a table...');
   
       console.log('Insert some data using exec()...');
-      for (let i = 20; i <= 25; ++i) {
+      for (let i = 1; i <= 10; ++i) {
         await promiser('exec', {
           dbId,
           sql: 'INSERT INTO t(a,b) VALUES (?,?)',
@@ -48,10 +47,10 @@ function SqliteConsole() {
       console.log('Query data with exec()');
       await promiser('exec', {
         dbId,
-        sql: 'SELECT a FROM t ORDER BY a LIMIT 10000',
+        sql: 'SELECT a, b FROM t ORDER BY a LIMIT 3',
         callback: (result) => {
           if (!result.row) {
-            return;
+        return;
           }
           console.log("query request = " + result.row);
         },
@@ -64,12 +63,22 @@ function SqliteConsole() {
       }
       console.error(err.name, err.message);
     }
-  })();
+  };
 
   return (
     <div>
-      <button onClick={() => setCount((count) => count + 1)}>
-        Sqlite is {count}
+      <p>
+        Open the console to see the SQLite3 worker logs.
+      </p>
+      <p>
+        This is a demo of using SQLite3 in a web worker with OPFS support.
+      </p>
+      <p>
+        The SQLite3 worker is initialized and a table is created with some data inserted.
+        You can see the logs in the console.
+      </p>
+      <button onClick={callDatabase}>
+        Sqlite trigger
       </button>
     </div>
   )
