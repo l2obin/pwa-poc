@@ -78,7 +78,7 @@ function SqliteConsole() {
         The SQLite3 worker is initialized and a table is created with some data inserted.
         You can see the logs in the console.
       </p>
-      <Button onClick={callDatabase}>Test</Button>
+      <Button variant="outline" onClick={callDatabase}>Insert some data</Button>
     </div>
   )
 }
