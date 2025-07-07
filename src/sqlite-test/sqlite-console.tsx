@@ -67,7 +67,7 @@ function SqliteConsole() {
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center h-screen p-4">
       <p className="font-semibold">
         Open the console to see the SQLite3 worker logs.
       </p>
@@ -78,10 +78,6 @@ function SqliteConsole() {
         The SQLite3 worker is initialized and a table is created with some data inserted.
         You can see the logs in the console.
       </p>
-      {/* <button onClick={callDatabase}>
-        Sqlite trigger
-      </button> */}
-
       <Button onClick={callDatabase}>Test</Button>
     </div>
   )
