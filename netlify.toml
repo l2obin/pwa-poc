@@ -1,5 +1,20 @@
+[build]
+  command = "npm run build:dev"
+  publish = "dist"
+
 [[headers]]
+  # Define the path pattern for which these headers apply.
+  # In this case, it's all paths ('/*').
   for = "/*"
   [headers.values]
+    # Enables COOP, allowing the browser to block cross-origin requests.
     Cross-Origin-Opener-Policy = "same-origin"
+    # Enables COEP, requiring explicit cross-origin permissions.
     Cross-Origin-Embedder-Policy = "require-corp"
+    # Enables access to the OPFS.  This is often handled by the browser and JavaScript,
+    # but including it in headers can help with debugging and ensure correct behavior.
+    #  Consider adjusting this based on your specific needs.  It might be better
+    #  to handle this via JavaScript within your application.
+    #  See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Embedder-Policy
+    #  and https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/getDirectory
+    Origin-Agent-Cluster = "?1"
