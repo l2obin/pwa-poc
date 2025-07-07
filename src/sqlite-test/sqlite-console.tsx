@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm';
+import { toast } from 'sonner';
 
 function SqliteConsole() {
   // Initialize the SQLite3 worker and run a demo trigger by a button click
@@ -58,11 +59,15 @@ function SqliteConsole() {
       });
   
       await promiser('close', { dbId });
+
+      toast.success('SQLite3 worker operations completed successfully!');
     } catch (err) {
       if (!(err instanceof Error)) {
         err = new Error(err.result.message);
       }
       console.error(err.name, err.message);
+
+      toast.error(`SQLite3 worker error: ${err.name} - ${err.message}`);
     }
   };
 
