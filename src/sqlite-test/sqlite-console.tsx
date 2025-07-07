@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm';
 
 function SqliteConsole() {
@@ -67,7 +68,7 @@ function SqliteConsole() {
 
   return (
     <div>
-      <p>
+      <p className="font-semibold">
         Open the console to see the SQLite3 worker logs.
       </p>
       <p>
@@ -77,9 +78,11 @@ function SqliteConsole() {
         The SQLite3 worker is initialized and a table is created with some data inserted.
         You can see the logs in the console.
       </p>
-      <button onClick={callDatabase}>
+      {/* <button onClick={callDatabase}>
         Sqlite trigger
-      </button>
+      </button> */}
+
+      <Button onClick={callDatabase}>Test</Button>
     </div>
   )
 }
