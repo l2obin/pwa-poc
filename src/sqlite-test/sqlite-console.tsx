@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm';
+import { TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -139,7 +140,7 @@ function SqliteConsole() {
     }
   }
 
-   const deleteAllTables = async () => {
+  const deleteAllTables = async () => {
     try {
       const { promiser, dbId } = await initiateDatabase();
 
@@ -161,6 +162,29 @@ function SqliteConsole() {
     }
   }
 
+  const removeRow = async (rowId: number) => {
+    try {
+      const { promiser, dbId } = await initiateDatabase();
+
+      console.log(`Removing row with id ${rowId}...`);
+      await promiser('exec', {
+        dbId,
+        sql: 'DELETE FROM t WHERE a = ?',
+        bind: [rowId],
+      });
+
+      // Update the state to remove the row
+      setRows((prevRows) => prevRows.filter(row => row.a !== rowId));
+
+      toast.success(`Row with id ${rowId} removed successfully!`);
+    } catch (err) {
+      if (!(err instanceof Error)) {
+        err = new Error(err.result.message);
+      }
+      console.error(err.name, err.message);
+      toast.error(`SQLite3 worker error: ${err.name} - ${err.message}`);
+    }
+  }
 
   return (
     <>
@@ -178,6 +202,13 @@ function SqliteConsole() {
               <CardHeader>
                 <CardTitle>Item {row.a}</CardTitle>
                 <CardDescription>Card Description {row.b}</CardDescription>
+                <CardAction
+                  className="flex justify-end"
+                >
+                  <Button variant="secondary" size="icon" onClick={() => removeRow(row.a)}>
+                    <TrashIcon className="h-4 w-4" />
+                  </Button>
+                </CardAction>
               </CardHeader>
             </Card>
           ))}
