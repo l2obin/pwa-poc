@@ -119,7 +119,7 @@ function SqliteConsole() {
     }
   };
 
-  const clearDatabase = async () => {
+  const clearAllRows = async () => {
     try {
       const { promiser, dbId } = await initiateDatabase();
 
@@ -189,10 +189,10 @@ function SqliteConsole() {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-        <Button onClick={insertSampleData}>Insert some data</Button>
-        <Button variant="secondary" onClick={fetchDatabase}>Fetch all data</Button>
-        <Button variant="destructive" onClick={clearDatabase}>Clear Database</Button>
-        <Button variant="destructive" onClick={deleteAllTables}>Delete All Tables</Button>
+        <Button size="lg" onClick={fetchDatabase}>Fetch all data</Button>
+        <Button variant="secondary" size="lg" onClick={insertSampleData}>Insert some data</Button>
+        <Button variant="destructive_outline" size="lg" onClick={clearAllRows}>Clear All Rows</Button>
+        <Button variant="destructive_outline" size="lg" onClick={deleteAllTables}>Delete All Tables</Button>
       </div>
       <div className="p-4">
         <h3 className="font-semibold mb-2">Fetched Rows:</h3>
@@ -205,7 +205,7 @@ function SqliteConsole() {
                 <CardAction
                   className="flex justify-end"
                 >
-                  <Button variant="secondary" size="icon" onClick={() => removeRow(row.a)}>
+                  <Button variant="destructive_outline" size="icon" onClick={() => removeRow(row.a)}>
                     <TrashIcon className="h-4 w-4" />
                   </Button>
                 </CardAction>
