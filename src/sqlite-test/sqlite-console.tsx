@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { sqlite3Worker1Promiser } from '@sqlite.org/sqlite-wasm';
+import { initializeSQLite } from '@/database/sqlite-opfs/sqlite-service';
 import { TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -12,55 +12,9 @@ function SqliteConsole() {
   // Add useState for array of object with a and b fields
   const [rows, setRows] = useState<{ a: number; b: number }[]>([]);
 
-  const initiateDatabase = async () => {
-    try {
-      console.log('Loading and initializing SQLite3 module...');
-
-      const promiser = await new Promise((resolve) => {
-        const _promiser = sqlite3Worker1Promiser({
-          onready: () => {
-            resolve(_promiser);
-          },
-        });
-      });
-
-      console.log('Done initializing. Running demo...');
-
-      let response;
-
-      response = await promiser('config-get', {});
-      console.log('Running SQLite3 version', response.result.version.libVersion);
-
-      response = await promiser('open', {
-        filename: 'file:worker-promiser.sqlite3?vfs=opfs',
-      });
-      const { dbId } = response;
-      console.log(
-        'OPFS is available, created persisted database at',
-        response.result.filename.replace(/^file:(.*?)\?vfs=opfs$/, '$1'),
-      );
-
-      // Create a table if it does not exist
-      // a field is id and auto-incremented, b field is a random number
-      await promiser('exec', {
-        dbId,
-        sql: 'CREATE TABLE IF NOT EXISTS t(a INTEGER PRIMARY KEY AUTOINCREMENT, b INTEGER)',
-      });
-      console.log('Creating a table...');
-
-      return { promiser, dbId };
-    } catch (err) {
-      if (!(err instanceof Error)) {
-        err = new Error(err.result.message);
-      }
-      console.error(err.name, err.message);
-      throw err;
-    }
-  }
-
   const fetchDatabase = async () => {
     try {
-      const { promiser, dbId } = await initiateDatabase();
+      const { promiser, dbId } = await initializeSQLite();
 
       console.log('Query data with exec()');
 
@@ -79,8 +33,6 @@ function SqliteConsole() {
       console.log('Fetched rows:', rows);
 
       setRows(rows);
-
-      toast.success('Fetched rows successfully!');
     } catch (err) {
       if (!(err instanceof Error)) {
         err = new Error(err.result.message);
@@ -93,7 +45,7 @@ function SqliteConsole() {
 
   const insertSampleData = async () => {
     try {
-      const { promiser, dbId } = await initiateDatabase();
+      const { promiser, dbId } = await initializeSQLite();
   
       console.log('Insert some data using exec()...');
       for (let i = 1; i <= 1; ++i) {
@@ -103,10 +55,8 @@ function SqliteConsole() {
           bind: [Math.floor(Math.random() * 100000000)],
         });
       }
-  
-      await promiser('close', { dbId });
 
-      toast.success('SQLite3 worker operations completed successfully!');
+      toast.success('Inserted sample data successfully!');
 
       await fetchDatabase();
     } catch (err) {
@@ -121,7 +71,7 @@ function SqliteConsole() {
 
   const clearAllRows = async () => {
     try {
-      const { promiser, dbId } = await initiateDatabase();
+      const { promiser, dbId } = await initializeSQLite();
 
       console.log('Clearing the table...');
       await promiser('exec', {
@@ -130,7 +80,7 @@ function SqliteConsole() {
       });
 
       setRows([]);
-      toast.success('Database cleared successfully!');
+      toast.success('Clear the table successfully!');
     } catch (err) {
       if (!(err instanceof Error)) {
         err = new Error(err.result.message);
@@ -164,7 +114,7 @@ function SqliteConsole() {
 
   const removeRow = async (rowId: number) => {
     try {
-      const { promiser, dbId } = await initiateDatabase();
+      const { promiser, dbId } = await initializeSQLite();
 
       console.log(`Removing row with id ${rowId}...`);
       await promiser('exec', {
