@@ -158,14 +158,8 @@ function SqliteConsole() {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>  
-      {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-        <Button size="lg" onClick={fetchData}>Fetch all data</Button>
-        <Button variant="secondary" size="lg" onClick={insertSampleData}>Insert some data</Button>
-        <Button variant="destructive_outline" size="lg" onClick={clearAllRows}>Clear All Rows</Button>
-        <Button variant="destructive_outline" size="lg" onClick={deleteAllTables}>Delete All Tables</Button>
-      </div> */}
       <div className="p-4">
-        <h3 className="font-semibold mb-2">Fetched Rows:</h3>
+        <h3 className="font-semibold mb-2">Sample Rows:</h3>
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
           {rows.map((row) => (
             <Card key={row.a}>
