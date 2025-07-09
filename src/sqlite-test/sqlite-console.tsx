@@ -1,7 +1,8 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { initializeSQLite } from '@/database/sqlite-opfs/sqlite-service';
-import { TrashIcon } from 'lucide-react';
+import { PlusCircleIcon, RefreshCwIcon, SettingsIcon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -12,7 +13,7 @@ function SqliteConsole() {
   // Add useState for array of object with a and b fields
   const [rows, setRows] = useState<{ a: number; b: number }[]>([]);
 
-  const fetchDatabase = async () => {
+  const fetchData = async () => {
     try {
       const { promiser, dbId } = await initializeSQLite();
 
@@ -58,7 +59,7 @@ function SqliteConsole() {
 
       toast.success('Inserted sample data successfully!');
 
-      await fetchDatabase();
+      await fetchData();
     } catch (err) {
       if (!(err instanceof Error)) {
         err = new Error(err.result.message);
@@ -92,7 +93,7 @@ function SqliteConsole() {
 
   const deleteAllTables = async () => {
     try {
-      const { promiser, dbId } = await initiateDatabase();
+      const { promiser, dbId } = await initializeSQLite();
 
       console.log('Deleting all tables...');
       
@@ -138,12 +139,31 @@ function SqliteConsole() {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
-        <Button size="lg" onClick={fetchDatabase}>Fetch all data</Button>
+      <div className="flex items-center justify-between p-4">
+        <Button variant="outline" size="icon" onClick={fetchData}>
+          <RefreshCwIcon className="h-4 w-4" />
+        </Button>
+        <Button variant="secondary" size="icon" onClick={insertSampleData}>
+          <PlusCircleIcon className="h-4 w-4" />
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon">
+              <SettingsIcon className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56">
+            <DropdownMenuItem variant='destructive' onClick={clearAllRows}>Clear All Rows</DropdownMenuItem>
+            <DropdownMenuItem variant='destructive' onClick={deleteAllTables}>Delete All Tables</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>  
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+        <Button size="lg" onClick={fetchData}>Fetch all data</Button>
         <Button variant="secondary" size="lg" onClick={insertSampleData}>Insert some data</Button>
         <Button variant="destructive_outline" size="lg" onClick={clearAllRows}>Clear All Rows</Button>
         <Button variant="destructive_outline" size="lg" onClick={deleteAllTables}>Delete All Tables</Button>
-      </div>
+      </div> */}
       <div className="p-4">
         <h3 className="font-semibold mb-2">Fetched Rows:</h3>
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
