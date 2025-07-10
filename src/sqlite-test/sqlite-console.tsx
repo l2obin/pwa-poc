@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { initializeSQLite } from '@/database/sqlite-opfs/sqlite-service';
-import { PlusCircleIcon, RefreshCwIcon, SettingsIcon, TrashIcon } from 'lucide-react';
+import { DatabaseIcon, DatabaseZapIcon, FileX2Icon, PlusCircleIcon, RefreshCwIcon, SettingsIcon, Trash2Icon, TrashIcon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -149,12 +149,18 @@ function SqliteConsole() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">
-              <SettingsIcon className="h-4 w-4" />
+              <DatabaseIcon className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            <DropdownMenuItem variant='destructive' onClick={clearAllRows}>Clear All Rows</DropdownMenuItem>
-            <DropdownMenuItem variant='destructive' onClick={deleteAllTables}>Delete All Tables</DropdownMenuItem>
+          <DropdownMenuContent className="w-56" align="end">
+            <DropdownMenuItem variant='destructive' onClick={clearAllRows}>
+              <FileX2Icon className="h-4 w-4 mr-2" />
+              <span>Clear All Rows</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem variant='destructive' onClick={deleteAllTables}>
+              <DatabaseZapIcon className="h-4 w-4 mr-2" />
+              <span>Delete Database</span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>  
@@ -170,7 +176,7 @@ function SqliteConsole() {
                   className="flex justify-end"
                 >
                   <Button variant="destructive_outline" size="icon" onClick={() => removeRow(row.a)}>
-                    <TrashIcon className="h-4 w-4" />
+                    <Trash2Icon className="h-4 w-4" />
                   </Button>
                 </CardAction>
               </CardHeader>
