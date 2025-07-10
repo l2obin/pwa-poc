@@ -21,7 +21,7 @@ export function MainNav({ items, children }: MainNavProps) {
   const segment = window.location.pathname.split("/")[1] || "home"
 
   return (
-    <div className="flex gap-4 md:gap-10 p-2 bg-gray-100 dark:bg-gray-900 fixed top-0 left-0 right-0 z-50">
+    <div className="flex gap-4 md:gap-10 p-2 bg-gray-100 dark:bg-neutral-900 fixed top-0 left-0 right-0 z-50">
       <Button variant="ghost" className="flex items-center space-x-2">
         <LightbulbIcon className="h-6 w-6" />
         <span className="font-bold">
