@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { initializeSQLite } from '@/database/sqlite-opfs/sqlite-service';
-import { DatabaseIcon, DatabaseZapIcon, FileX2Icon, PlusCircleIcon, RefreshCwIcon, SettingsIcon, Trash2Icon, TrashIcon } from 'lucide-react';
+import { DatabaseIcon, DatabaseZapIcon, FileX2Icon, PlusCircleIcon, RefreshCwIcon, Trash2Icon } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
