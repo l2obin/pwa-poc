@@ -143,7 +143,7 @@ function SqliteConsole() {
   return (
     <>
       <div className="flex items-center justify-between p-4">
-        <Button variant="outline" size="icon" onClick={fetchData}>
+        <Button size="icon" onClick={fetchData}>
           <RefreshCwIcon className="h-4 w-4" />
         </Button>
         <Button variant="secondary" size="icon" onClick={insertSampleData}>
