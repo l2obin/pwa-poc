@@ -209,7 +209,7 @@ function SqliteConsole() {
                 <CardAction
                   className="flex justify-end"
                 >
-                  <Button variant="destructive_outline" size="icon" onClick={() => removeRow(row.a)}>
+                  <Button variant="outline_destructive" size="icon" onClick={() => removeRow(row.a)}>
                     <Trash2Icon className="h-4 w-4" />
                   </Button>
                 </CardAction>
