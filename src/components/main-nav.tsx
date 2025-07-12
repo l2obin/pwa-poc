@@ -2,6 +2,7 @@ import * as React from "react"
 import { useNavigate } from '@tanstack/react-router'
 
 import logo from "@/assets/logo.svg"
+import logo_dark  from "@/assets/logo-dark.svg"
 
 import type { MainNavItem } from "@/types"
 import { siteConfig } from "@/config/site"
@@ -25,7 +26,8 @@ export function MainNav({ items, children }: MainNavProps) {
     <div className="flex gap-4 md:gap-10 p-2 bg-gray-50 dark:bg-neutral-950 fixed top-0 left-0 right-0 z-50 border-b border-gray-300 dark:border-neutral-700">
       <Button variant="ghost" className="flex items-center space-x-2">
         {/* <LightbulbIcon className="h-6 w-6" /> */}
-        <img src={logo} alt="logo" />
+        <img src={logo} alt="logo" className="inline-block dark:hidden"/>
+        <img src={logo_dark} alt="logo dark" className="hidden dark:inline-block" />
         <span className="font-bold">
           {siteConfig.name}
         </span>

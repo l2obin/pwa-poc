@@ -142,36 +142,6 @@ function SqliteConsole() {
 
   return (
     <>
-      <AlertDialog open={confirmDeleteRows} onOpenChange={setConfirmDeleteRows}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete all rows?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete all data in the database and you will not be able to recover it.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={clearAllRows}>Continue</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
-      <AlertDialog open={confirmDeleteDatabase} onOpenChange={setConfirmDeleteDatabase}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete your local database?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will delete your entire local database, including all tables and data. You will not be able to recover it.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={deleteAllTables}>Continue</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
       <div className="flex items-center justify-between p-4">
         <Button variant="outline" size="icon" onClick={fetchData}>
           <RefreshCwIcon className="h-4 w-4" />
@@ -218,6 +188,36 @@ function SqliteConsole() {
           ))}
         </div>
       </div>
+
+      <AlertDialog open={confirmDeleteRows} onOpenChange={setConfirmDeleteRows}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete all rows?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete all data in the database and you will not be able to recover it.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={clearAllRows}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={confirmDeleteDatabase} onOpenChange={setConfirmDeleteDatabase}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete your local database?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will delete your entire local database, including all tables and data. You will not be able to recover it.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={deleteAllTables}>Continue</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   )
 }
