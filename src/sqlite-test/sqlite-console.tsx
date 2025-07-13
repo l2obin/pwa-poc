@@ -4,7 +4,7 @@ import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/comp
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { initializeSQLite } from '@/database/sqlite-opfs/sqlite-service';
 import { DatabaseIcon, DatabaseZapIcon, FileX2Icon, PlusCircleIcon, RefreshCwIcon, Trash2Icon } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
 function SqliteConsole() {
@@ -15,6 +15,12 @@ function SqliteConsole() {
   const [rows, setRows] = useState<{ a: number; b: number }[]>([]);
   const [confirmDeleteRows, setConfirmDeleteRows] = useState(false);
   const [confirmDeleteDatabase, setConfirmDeleteDatabase] = useState(false);
+
+  // Get data on component mount
+  useEffect(() => {
+    console.log('fetchData() called on mount');
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
