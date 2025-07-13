@@ -20,7 +20,7 @@ export const Route = createRootRoute({
   component: () => (
     <>
       <MainNav items={NAV_ITEMS}/>
-      <div className='pt-16 px-2 md:px-4'>
+      <div className='mt-18'>
         <Outlet />
       </div>
       {showDevtools && <TanStackRouterDevtools />}

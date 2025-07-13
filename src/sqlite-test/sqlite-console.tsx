@@ -148,11 +148,9 @@ function SqliteConsole() {
 
   return (
     <>
-      <div className="flex items-center justify-between p-4">
-        <Button size="icon" onClick={fetchData}>
-          <RefreshCwIcon className="h-4 w-4" />
-        </Button>
-        <Button variant="secondary" size="icon" onClick={insertSampleData}>
+      <div className="flex items-center justify-between px-6 py-4 sticky top-16 bg-background/70 backdrop-blur-sm">
+        <h3 className="font-semibold text-xl">Records</h3>
+        <Button size="icon" onClick={insertSampleData}>
           <PlusCircleIcon className="h-4 w-4" />
         </Button>
         <DropdownMenu>
@@ -174,17 +172,14 @@ function SqliteConsole() {
         </DropdownMenu>
       </div>
       
-      <div className="p-4">
-        <h3 className="font-semibold mb-2">Sample Rows:</h3>
+      <div className="px-6 py-4">
         <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
           {rows.map((row) => (
             <Card key={row.a}>
               <CardHeader>
                 <CardTitle>Item {row.a}</CardTitle>
                 <CardDescription>Card Description {row.b}</CardDescription>
-                <CardAction
-                  className="flex justify-end"
-                >
+                <CardAction className="flex justify-end">
                   <Button variant="outline_destructive" size="icon" onClick={() => removeRow(row.a)}>
                     <Trash2Icon className="h-4 w-4" />
                   </Button>
