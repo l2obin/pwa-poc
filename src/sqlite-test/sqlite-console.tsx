@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { initializeSQLite } from '@/database/sqlite-opfs/sqlite-service';
-import { DatabaseIcon, DatabaseZapIcon, FileX2Icon, PlusCircleIcon, RefreshCwIcon, Trash2Icon } from 'lucide-react';
+import { DatabaseIcon, DatabaseZapIcon, FileX2Icon, PlusIcon, Trash2Icon } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 
@@ -150,9 +150,6 @@ function SqliteConsole() {
     <>
       <div className="flex items-center justify-between px-6 py-4 sticky top-16 bg-background/70 backdrop-blur-sm">
         <h3 className="font-semibold text-xl">Records</h3>
-        <Button size="icon" onClick={insertSampleData}>
-          <PlusCircleIcon className="h-4 w-4" />
-        </Button>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="icon">
@@ -170,6 +167,10 @@ function SqliteConsole() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        <Button onClick={insertSampleData}>
+          <PlusIcon className="h-4 w-4" />
+          <span>Add</span>
+        </Button>
       </div>
       
       <div className="px-6 py-4">
