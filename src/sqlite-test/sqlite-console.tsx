@@ -148,7 +148,7 @@ function SqliteConsole() {
 
   return (
     <>
-      <div className="flex items-center justify-between px-6 py-4 sticky top-16 bg-background/70 backdrop-blur-sm">
+      <div className="flex items-center justify-between px-6 py-4 sticky top-16 bg-background/60 backdrop-blur-sm">
         <h3 className="font-semibold text-xl">Records</h3>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
