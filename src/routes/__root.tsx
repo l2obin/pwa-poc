@@ -11,6 +11,10 @@ const NAV_ITEMS: NavItem[] = [
     href: '/'
   },
   {
+    title: 'Diagram',
+    href: '/diagram'
+  },
+  {
     title: 'About',
     href: '/about'
   }
