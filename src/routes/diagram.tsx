@@ -8,10 +8,9 @@ export const Route = createFileRoute('/diagram')({
 })
 
 function Diagram() {
-
   const { theme } = useTheme()
 
-  return <div className="w-screen h-screen">
-      <Excalidraw theme={theme} />
+  return <div className="w-screen h-[calc(100vh-4.5rem)]">
+    <Excalidraw theme={theme} />
   </div>;
 }
