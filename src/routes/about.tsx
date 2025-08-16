@@ -13,6 +13,7 @@ function About() {
   const [clientIdB64, setClientIdB64] = useState<string | null>(null)
   const [storedWrappedB64, setStoredWrappedB64] = useState<string | null>(null)
   const [hmacSupported, setHmacSupported] = useState<boolean | null>(null)
+  const [allowHmacFallback, setAllowHmacFallback] = useState<boolean>(false)
   const [message, setMessage] = useState<string | null>(null)
 
   // Keep raw CryptoKey in ref when generated so we can import later if needed
@@ -77,9 +78,17 @@ function About() {
       const key = await crypto.subtle.importKey('raw', raw.buffer, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt'])
       dekKeyRef.current = key
       dekRawRef.current = raw.buffer.slice(0)
-      setDekB64(null)
+      // show DEK in base64 for demo purposes (will be cleared after timeout or when wrapped)
+      try {
+        setDekB64(bufToB64(dekRawRef.current as ArrayBuffer))
+      } catch { setDekB64(null) }
       setWrappedB64(null)
-      setMessage('DEK generated (non-extractable). Raw will be cleared after wrap.')
+      setMessage('DEK generated (shown briefly)')
+      // clear raw and displayed DEK after 30s if not wrapped
+      setTimeout(() => {
+        try { if (dekRawRef.current) new Uint8Array(dekRawRef.current).fill(0); dekRawRef.current = null } catch { void 0 }
+        setDekB64(null)
+      }, 30000)
     } catch (err) {
       setMessage('Error generating DEK: ' + String(err))
     }
@@ -97,7 +106,11 @@ function About() {
         challenge: challenge.buffer,
         rp: { name: 'Local Demo' },
         user: { id: userId, name: 'local-user', displayName: 'Local User' },
-        pubKeyCredParams: [{ alg: -7, type: 'public-key' }], // ES256
+        // Include both ES256 and RS256 to improve compatibility across authenticators
+        pubKeyCredParams: [
+          { alg: -7, type: 'public-key' }, // ES256
+          { alg: -257, type: 'public-key' }, // RS256
+        ],
         attestation: 'none',
         authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required' },
       }
@@ -171,12 +184,22 @@ function About() {
       const idB64 = await ensureCredential()
       if (!idB64) throw new Error('No credential id available')
 
-      // Try hmac-secret via assertion (best-effort)
+      // Try hmac-secret via assertion (best-effort). If it fails and fallback is disabled, abort.
       let kek: CryptoKey | null = null
       try {
+        const allowCreds: PublicKeyCredentialDescriptor[] = credentialIdB64
+          ? [
+              {
+                id: new Uint8Array(b64ToBuf(credentialIdB64)),
+                type: 'public-key',
+                transports: ['internal' as AuthenticatorTransport],
+              },
+            ]
+          : []
+
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        const assertion = await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)).buffer, allowCredentials: [], userVerification: 'required' }, extensions: { hmacGetSecret: true } }) as PublicKeyCredential | null
+        const assertion = await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)).buffer, allowCredentials: allowCreds, userVerification: 'required', extensions: { hmacGetSecret: true } } }) as PublicKeyCredential | null
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const ext = assertion?.getClientExtensionResults?.() || assertion?.clientExtensionResults
@@ -186,9 +209,19 @@ function About() {
           setHmacSupported(true)
         } else {
           setHmacSupported(false)
+          if (!allowHmacFallback) {
+            setMessage('Authenticator did not provide hmac-secret and fallback is disabled — aborting wrap.')
+            return
+          }
         }
-      } catch {
+      } catch (err) {
         setHmacSupported(false)
+        const name = (err && (err as Error).name) || String(err)
+        if (!allowHmacFallback) {
+          setMessage('hmac-secret assertion failed (' + name + '). Fallback disabled — aborting.')
+          return
+        }
+        setMessage('hmac-secret assertion failed (' + name + '). Falling back to local derivation because fallback is enabled.')
       }
 
       if (!kek) kek = await deriveKekFromCredentialId(idB64)
@@ -205,7 +238,7 @@ function About() {
       setWrappedB64(wrapped)
       setStoredWrappedB64(wrapped)
       // zero raw
-      try { if (dekRawRef.current) new Uint8Array(dekRawRef.current).fill(0); dekRawRef.current = null } catch {}
+  try { if (dekRawRef.current) new Uint8Array(dekRawRef.current).fill(0); dekRawRef.current = null } catch { void 0 }
       setMessage('DEK wrapped and stored in IndexedDB')
     } catch (e) {
       setMessage('Error wrapping DEK: ' + String(e))
@@ -220,7 +253,44 @@ function About() {
       if (!wrapped) throw new Error('No wrapped DEK available. Wrap one first.')
       const idB64 = credentialIdB64 || (await ensureCredential())
       if (!idB64) throw new Error('No credential id available')
-      const kek = await deriveKekFromCredentialId(idB64)
+      // Try hmac-secret first; abort if it fails and fallback is disabled
+      let kek: CryptoKey | null = null
+      try {
+        const allowCreds: PublicKeyCredentialDescriptor[] = credentialIdB64
+          ? [
+              {
+                id: new Uint8Array(b64ToBuf(credentialIdB64)),
+                type: 'public-key',
+                transports: ['internal' as AuthenticatorTransport],
+              },
+            ]
+          : []
+        // @ts-ignore
+        const assertion = await navigator.credentials.get({ publicKey: { challenge: crypto.getRandomValues(new Uint8Array(32)).buffer, allowCredentials: allowCreds, userVerification: 'required', extensions: { hmacGetSecret: true } } }) as PublicKeyCredential | null
+        // @ts-ignore
+        const ext = assertion?.getClientExtensionResults?.() || assertion?.clientExtensionResults
+        if (ext && ext.hmacGetSecret) {
+          const secretBuf = ext.hmacGetSecret as ArrayBuffer
+          kek = await crypto.subtle.importKey('raw', secretBuf, 'AES-GCM', false, ['encrypt', 'decrypt'])
+          setHmacSupported(true)
+        } else {
+          setHmacSupported(false)
+          if (!allowHmacFallback) {
+            setMessage('Authenticator did not provide hmac-secret and fallback is disabled — aborting unwrap.')
+            return
+          }
+        }
+      } catch (err) {
+        setHmacSupported(false)
+        const name = (err && (err as Error).name) || String(err)
+        if (!allowHmacFallback) {
+          setMessage('hmac-secret assertion failed (' + name + '). Fallback disabled — aborting.')
+          return
+        }
+        setMessage('hmac-secret assertion failed (' + name + '). Falling back to local derivation because fallback is enabled.')
+      }
+
+      if (!kek) kek = await deriveKekFromCredentialId(idB64)
       const combinedBuf = b64ToBuf(wrapped)
       const combined = new Uint8Array(combinedBuf)
       const iv = combined.slice(0, 12)
@@ -229,8 +299,16 @@ function About() {
       // import as a non-extractable key for use
       const imported = await crypto.subtle.importKey('raw', plain, { name: 'AES-GCM' }, false, ['encrypt', 'decrypt'])
       dekKeyRef.current = imported
-      setMessage('Successfully unwrapped DEK and imported as non-extractable key')
-      setDekB64(null)
+      // show DEK (base64) briefly for demo purposes
+      try {
+        setDekB64(bufToB64(plain))
+      } catch { setDekB64(null) }
+      setMessage('Successfully unwrapped DEK and imported as non-extractable key (shown briefly)')
+      // clear displayed DEK and zero plaintext after 30s
+      setTimeout(() => {
+        try { new Uint8Array(plain).fill(0) } catch { void 0 }
+        setDekB64(null)
+      }, 30000)
     } catch (e) {
       setMessage('Error unwrapping DEK: ' + String(e))
     }
@@ -251,10 +329,10 @@ function About() {
           setStoredWrappedB64(wrapped)
           setWrappedB64(wrapped)
         }
-      } catch {}
+  } catch { void 0 }
     })()
     return () => { mounted = false }
-  }, [])
+  }, [idbGet])
 
   return (
     <div className="p-4 space-y-4">
@@ -265,6 +343,11 @@ function About() {
         <button className="btn" onClick={() => generateDek()}>Generate DEK (WebCrypto)</button>
         <button className="btn" onClick={() => wrapDek()}>Wrap DEK using WebAuthn-derived KEK</button>
         <button className="btn" onClick={() => unwrapDek()}>Unwrap DEK (WebCrypto)</button>
+      </div>
+
+      <div className="flex items-center gap-2">
+        <input id="hmac-fallback" type="checkbox" checked={allowHmacFallback} onChange={(e) => setAllowHmacFallback(e.target.checked)} />
+        <label htmlFor="hmac-fallback" className="text-sm">Allow fallback to local KEK derivation if authenticator hmac-secret is unavailable (disabled by default)</label>
       </div>
 
       <div className="space-y-2">
