@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useRef, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 
 export const Route = createFileRoute('/about')({
   component: About,
@@ -340,14 +342,14 @@ function About() {
       <p className="text-sm text-muted-foreground">This page demonstrates generating a DEK with WebCrypto, deriving a KEK from a locally-created WebAuthn credential id (demo-only), wrapping the DEK, and unwrapping it.</p>
 
       <div className="flex gap-2">
-        <button className="btn" onClick={() => generateDek()}>Generate DEK (WebCrypto)</button>
-        <button className="btn" onClick={() => wrapDek()}>Wrap DEK using WebAuthn-derived KEK</button>
-        <button className="btn" onClick={() => unwrapDek()}>Unwrap DEK (WebCrypto)</button>
+        <Button onClick={() => generateDek()}>Generate DEK (WebCrypto)</Button>
+        <Button onClick={() => wrapDek()}>Wrap DEK using WebAuthn-derived KEK</Button>
+        <Button onClick={() => unwrapDek()}>Unwrap DEK (WebCrypto)</Button>
       </div>
 
       <div className="flex items-center gap-2">
         <input id="hmac-fallback" type="checkbox" checked={allowHmacFallback} onChange={(e) => setAllowHmacFallback(e.target.checked)} />
-        <label htmlFor="hmac-fallback" className="text-sm">Allow fallback to local KEK derivation if authenticator hmac-secret is unavailable (disabled by default)</label>
+        <Label htmlFor="hmac-fallback" className="text-sm">Allow fallback to local KEK derivation if authenticator hmac-secret is unavailable (disabled by default)</Label>
       </div>
 
       <div className="space-y-2">
