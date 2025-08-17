@@ -7,20 +7,20 @@ This is a Progressive Web App (PWA) built with React 19.1.0, TypeScript, Vite, S
 ## Working Effectively
 
 ### Bootstrap and Dependencies
-- **CRITICAL**: Use `npm` commands, NOT `pnpm`, despite the presence of pnpm-lock.yaml
-- Install dependencies: `npm install` -- takes 4+ minutes to complete. **NEVER CANCEL**. Set timeout to 300+ seconds.
-- Check installed packages: `npm list --depth=0`
+- **CRITICAL**: Use `pnpm` commands - this project uses pnpm as the package manager
+- Install dependencies: `pnpm install` -- takes 4+ minutes to complete. **NEVER CANCEL**. Set timeout to 300+ seconds.
+- Check installed packages: `pnpm list --depth=0`
 
 ### Build Commands
-- **Development build** (recommended): `npm run build:dev` -- takes 35+ seconds. **NEVER CANCEL**. Set timeout to 60+ seconds.
+- **Development build** (recommended): `pnpm run build:dev` -- takes 35+ seconds. **NEVER CANCEL**. Set timeout to 60+ seconds.
   - This runs Vite build only and WORKS successfully
   - Generates PWA manifest and service worker files
   - Use this for deployments and testing built application
-- **Production build**: `npm run build` -- **CURRENTLY FAILS** due to 29 TypeScript errors. Takes 5+ seconds to fail. Set timeout to 60+ seconds.
+- **Production build**: `pnpm run build` -- **CURRENTLY FAILS** due to 29 TypeScript errors. Takes 5+ seconds to fail. Set timeout to 60+ seconds.
   - Runs `tsc -b && vite build` (TypeScript compilation + Vite build)
   - **Known issue**: TypeScript compilation fails with errors in SQLite integration and WebAuthn demo code
   - Do not attempt to fix TypeScript errors unless specifically requested
-- **Preview built app**: `npm run preview` -- starts preview server in ~2 seconds
+- **Preview built app**: `pnpm run preview` -- starts preview server in ~2 seconds
 
 ### Development Server
 - **IMPORTANT**: The original config includes `mkcert` plugin which may fail in network-restricted environments with `AxiosError: Request failed with status code 403`
@@ -29,20 +29,20 @@ This is a Progressive Web App (PWA) built with React 19.1.0, TypeScript, Vite, S
   // Comment out or remove this line:
   // mkcert()
   ```
-- Start development server: `npm run dev` -- ready in ~2 seconds
-- For external access: `npm run dev -- --host`
+- Start development server: `pnpm run dev` -- ready in ~2 seconds
+- For external access: `pnpm run dev -- --host`
 - Development server runs on `http://localhost:5173/`
 - **HTTPS note**: WebAuthn and OPFS features work better with HTTPS, but HTTP localhost is sufficient for development
 
 ### Linting
-- Run ESLint: `npm run lint` -- takes 2+ seconds
+- Run ESLint: `pnpm run lint` -- takes 2+ seconds
 - **Known issues**: Currently shows 31+ problems (24+ errors, 7+ warnings)
   - Generated files in `dev-dist/` may show TypeScript ESLint rule errors
   - Unused variables in components and routes
   - TypeScript type issues with SQLite worker and WebAuthn code
   - React hooks dependency warnings
   - "@ts-ignore" usage that should be "@ts-expect-error"
-- **Before committing**: Always run `npm run lint` but expect existing errors
+- **Before committing**: Always run `pnpm run lint` but expect existing errors
 - **Note**: Some errors come from build artifacts - clean `dist/` and `dev-dist/` directories if needed
 - Do not fix linting errors unless specifically requested to maintain minimal changes
 
@@ -93,8 +93,8 @@ After making changes, **ALWAYS** test these complete user scenarios:
 ## Common Issues and Solutions
 
 ### TypeScript Compilation Errors
-- **Current status**: `npm run build` fails with 29 TypeScript errors
-- **Workaround**: Use `npm run build:dev` which skips TypeScript compilation
+- **Current status**: `pnpm run build` fails with 29 TypeScript errors
+- **Workaround**: Use `pnpm run build:dev` which skips TypeScript compilation
 - **Common error locations**:
   - `src/database/sqlite-opfs/sqlite-service.tsx` - SQLite worker type issues
   - `src/sqlite-test/sqlite-console.tsx` - Error handling type issues
@@ -131,11 +131,11 @@ After making changes, **ALWAYS** test these complete user scenarios:
 
 ### Important Files
 - `vite.config.ts` - Vite configuration with PWA, SQLite, and routing plugins
-- `package.json` - Dependencies and npm scripts (use npm, not pnpm)
+- `package.json` - Dependencies and pnpm scripts (use pnpm)
 - `worker.js` - SQLite WASM worker for database operations
 - `LOCAL_DATA_CRYPTO.md` - Documentation for WebAuthn and crypto implementation
 - `eslint.config.js` - ESLint configuration
-- `netlify.toml` - Deployment configuration using `npm run build:dev`
+- `netlify.toml` - Deployment configuration using `pnpm run build:dev`
 
 ### Technology Stack
 - **Frontend**: React 19.1.0, TypeScript, Vite 6.3.5
@@ -150,7 +150,7 @@ After making changes, **ALWAYS** test these complete user scenarios:
 ## Deployment
 
 ### Netlify Configuration
-- **Build command**: `npm run build:dev` (configured in netlify.toml)
+- **Build command**: `pnpm run build:dev` (configured in netlify.toml)
 - **Output directory**: `dist`
 - **Required headers**: COOP and COEP headers configured for OPFS support
 
@@ -178,7 +178,7 @@ After making changes, **ALWAYS** test these complete user scenarios:
 ## Performance Notes
 
 ### Expected Timing
-- **npm install**: 4+ minutes (large dependency tree)
+- **pnpm install**: 4+ minutes (large dependency tree)
 - **Development build**: 35+ seconds (Vite + PWA generation)
 - **Development server startup**: 2+ seconds
 - **Linting**: 2+ seconds
