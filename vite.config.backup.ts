@@ -3,9 +3,9 @@ import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
+import mkcert from 'vite-plugin-mkcert'
 import { VitePWA } from 'vite-plugin-pwa';
 
-// Note: mkcert removed for environment compatibility
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -59,7 +59,7 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest,wasm}"],
       }
     }),
-    // mkcert() - removed for environment compatibility
+    mkcert()
   ],
   resolve: {
     alias: {
