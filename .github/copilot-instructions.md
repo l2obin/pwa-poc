@@ -6,9 +6,20 @@ This is a Progressive Web App (PWA) built with React 19.1.0, TypeScript, Vite, S
 
 ## Working Effectively
 
+### Package Manager Guidelines
+- **ONLY use pnpm** - never use npm or yarn commands in this project
+- **Lock file management**: Only `pnpm-lock.yaml` should be committed and updated
+- **Forbidden**: Do not generate `package-lock.json` or `yarn.lock` files
+- **Dependencies**: Use `pnpm add/remove` commands to manage packages
+- **Note**: Both `pnpm-lock.yaml` and legacy `package-lock.json` may exist, but only pnpm should be used going forward
+
 ### Bootstrap and Dependencies
-- **CRITICAL**: Use `pnpm` commands - this project uses pnpm as the package manager
+- **CRITICAL**: Use `pnpm` commands ONLY - this project uses pnpm as the package manager
+- **NEVER use npm commands** - they will generate unwanted `package-lock.json` files
+- **ALWAYS update `pnpm-lock.yaml`** when adding/removing dependencies
 - Install dependencies: `pnpm install` -- takes 4+ minutes to complete. **NEVER CANCEL**. Set timeout to 300+ seconds.
+- Add new dependencies: `pnpm add <package>` or `pnpm add -D <package>` for dev dependencies
+- Remove dependencies: `pnpm remove <package>`
 - Check installed packages: `pnpm list --depth=0`
 
 ### Build Commands
