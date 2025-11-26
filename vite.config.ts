@@ -3,7 +3,7 @@ import tailwindcss from "@tailwindcss/vite"
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
-import mkcert from 'vite-plugin-mkcert'
+// import mkcert from 'vite-plugin-mkcert'
 import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vite.dev/config/
@@ -59,7 +59,7 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest,wasm}"],
       }
     }),
-    mkcert()
+    // mkcert()
   ],
   resolve: {
     alias: {
