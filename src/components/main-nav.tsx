@@ -62,6 +62,7 @@ export function MainNav({ items }: MainNavProps) {
           
           {/* Mobile Navigation - Hamburger Menu */}
           <div className="flex md:hidden ml-auto items-center gap-4">
+            <ModeToggle />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" aria-label="Open menu">
@@ -86,7 +87,6 @@ export function MainNav({ items }: MainNavProps) {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <ModeToggle />
           </div>
         </>
       ) : null}
