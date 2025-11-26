@@ -59,7 +59,6 @@ export default defineConfig({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest,wasm}"],
       }
     }),
-    // mkcert()
   ],
   resolve: {
     alias: {
