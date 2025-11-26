@@ -20,8 +20,12 @@ function Settings() {
     const checkSupport = async () => {
       if (navigator.storage && navigator.storage.persist) {
         setIsSupported(true)
-        const persisted = await navigator.storage.persisted()
-        setIsPersisted(persisted)
+        try {
+          const persisted = await navigator.storage.persisted()
+          setIsPersisted(persisted)
+        } catch (err) {
+          setMessage(`Error checking persistent storage status: ${String(err)}`)
+        }
       } else {
         setIsSupported(false)
         setMessage('StorageManager API is not supported in this browser.')
@@ -68,10 +72,14 @@ function Settings() {
       
       // Also get storage estimate if available
       if (navigator.storage.estimate) {
-        const estimate = await navigator.storage.estimate()
-        const usedMB = ((estimate.usage || 0) / (1024 * 1024)).toFixed(2)
-        const quotaMB = ((estimate.quota || 0) / (1024 * 1024)).toFixed(2)
-        setMessage(`Storage status updated. Using ${usedMB} MB of ${quotaMB} MB quota.`)
+        try {
+          const estimate = await navigator.storage.estimate()
+          const usedMB = ((estimate.usage || 0) / (1024 * 1024)).toFixed(2)
+          const quotaMB = ((estimate.quota || 0) / (1024 * 1024)).toFixed(2)
+          setMessage(`Storage status updated. Using ${usedMB} MB of ${quotaMB} MB quota.`)
+        } catch (estimateErr) {
+          setMessage(`Storage status updated. (Could not retrieve quota: ${String(estimateErr)})`)
+        }
       } else {
         setMessage('Storage status updated.')
       }
@@ -113,7 +121,7 @@ function Settings() {
                   id="persist-toggle"
                   checked={isPersisted || false}
                   onCheckedChange={handleTogglePersist}
-                  disabled={isRequesting || isPersisted === true}
+                  disabled={isRequesting}
                 />
               </div>
 
