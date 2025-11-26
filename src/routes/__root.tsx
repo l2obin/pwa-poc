@@ -17,6 +17,10 @@ const NAV_ITEMS: NavItem[] = [
   {
     title: 'About',
     href: '/about'
+  },
+  {
+    title: 'Settings',
+    href: '/settings'
   }
 ]
 
