@@ -61,7 +61,15 @@ const initializeSQLite = async (): Promise<SQLiteInitResult> => {
 };
 
 /**
- * Export the SQLite database from OPFS as a Uint8Array
+ * Export the SQLite database from OPFS as a Uint8Array.
+ * 
+ * This uses the SQLite WASM worker's export command which serializes the database
+ * that is stored in OPFS (Origin Private File System). The worker internally reads
+ * the database from OPFS and returns it as a byte array.
+ * 
+ * Note: SQLite WASM uses the opfs-sahpool VFS which stores data in a pooled
+ * structure rather than as a single file, so direct file access via the
+ * Storage Manager API is not straightforward.
  */
 const exportDatabase = async (): Promise<Uint8Array> => {
   const { promiser, dbId } = await initializeSQLite();
