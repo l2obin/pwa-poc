@@ -60,4 +60,17 @@ const initializeSQLite = async (): Promise<SQLiteInitResult> => {
   return sqliteInitPromise;
 };
 
-export { initializeSQLite };
+/**
+ * Export the SQLite database from OPFS as a Uint8Array
+ */
+const exportDatabase = async (): Promise<Uint8Array> => {
+  const { promiser, dbId } = await initializeSQLite();
+  
+  const exportResponse = await promiser("export", {
+    dbId,
+  });
+  
+  return exportResponse.result.byteArray;
+};
+
+export { initializeSQLite, exportDatabase };
