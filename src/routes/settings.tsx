@@ -4,6 +4,9 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { exportDatabase } from '@/database/sqlite-opfs/sqlite-service'
+import { toast } from 'sonner'
+import { DownloadIcon } from 'lucide-react'
 
 export const Route = createFileRoute('/settings')({
   component: Settings,
@@ -14,6 +17,7 @@ function Settings() {
   const [isRequesting, setIsRequesting] = useState(false)
   const [isSupported, setIsSupported] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  const [isExporting, setIsExporting] = useState(false)
 
   // Check if StorageManager API is supported
   useEffect(() => {
@@ -85,6 +89,33 @@ function Settings() {
       }
     } catch (err) {
       setMessage(`Error checking status: ${String(err)}`)
+    }
+  }
+
+  const handleExportDatabase = async () => {
+    setIsExporting(true)
+    try {
+      const dbData = await exportDatabase()
+      
+      // Create a blob from the database bytes
+      const blob = new Blob([dbData], { type: 'application/x-sqlite3' })
+      
+      // Create download link and trigger download
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `mydb-${new Date().toISOString().slice(0, 10)}.sqlite3`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      URL.revokeObjectURL(url)
+      
+      toast.success('Database exported successfully!')
+    } catch (err) {
+      console.error('Export error:', err)
+      toast.error(`Failed to export database: ${String(err)}`)
+    } finally {
+      setIsExporting(false)
     }
   }
 
@@ -161,6 +192,53 @@ function Settings() {
               </div>
             </>
           )}
+        </CardContent>
+      </Card>
+
+      <Card className="mt-6">
+        <CardHeader>
+          <CardTitle>Database Export</CardTitle>
+          <CardDescription>
+            Export your SQLite database stored in OPFS to a file.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <div className="space-y-1">
+              <Label className="text-base font-medium">
+                Export SQLite Database
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                Download a copy of your local database as a .sqlite3 file.
+              </p>
+            </div>
+            <Button 
+              onClick={handleExportDatabase}
+              disabled={isExporting}
+              variant="outline"
+            >
+              <DownloadIcon className="h-4 w-4" />
+              <span>{isExporting ? 'Exporting...' : 'Export'}</span>
+            </Button>
+          </div>
+
+          <div className="space-y-2 pt-4 border-t">
+            <h3 className="text-sm font-semibold">About Database Export</h3>
+            <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+              <li>Exports the SQLite database stored in OPFS (Origin Private File System)</li>
+              <li>The exported file can be opened with any SQLite-compatible tool</li>
+              <li>Use this to backup your data or transfer it to another device</li>
+            </ul>
+            <div className="mt-4 p-3 bg-muted rounded-md">
+              <h4 className="text-xs font-semibold mb-2">Technical Details</h4>
+              <p className="text-xs text-muted-foreground">
+                The export uses the SQLite WASM worker's export command, which serializes the database through the database connection. 
+                SQLite WASM uses the <code className="bg-background px-1 rounded">opfs-sahpool</code> VFS which stores data in a pooled structure 
+                with multiple internal files (not as a single .sqlite3 file), so direct file access via the Storage Manager API is not possible. 
+                The worker's export command properly handles the internal VFS structure and produces a valid, portable SQLite database file.
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

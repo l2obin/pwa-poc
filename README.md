@@ -2,6 +2,24 @@
 
 This template provides a minimal setup for a React application using TypeScript, Vite, and Progressive Web App (PWA) features, with SQLite support via the Origin Private File System (OPFS).
 
+## SQLite Database Storage
+
+This application uses SQLite WASM with the `opfs-sahpool` VFS (Virtual File System) to store data in the browser's Origin Private File System (OPFS). The database is persisted locally in the browser and survives page reloads and browser restarts.
+
+### Database Export
+
+The Settings page includes a database export feature that allows you to download a copy of your SQLite database as a `.sqlite3` file.
+
+**How it works:**
+
+The export uses the SQLite WASM worker's `export` command, which serializes the database through the database connection. This approach is used because:
+
+- SQLite WASM uses the `opfs-sahpool` VFS which stores data in a **pooled structure** with multiple internal files, not as a single `.sqlite3` file
+- Direct file access via the Storage Manager API (`navigator.storage.getDirectory()`) is not straightforward with this VFS architecture
+- The SQLite worker's export command properly handles the internal VFS structure and produces a valid, portable SQLite database file
+
+The exported `.sqlite3` file can be opened with any SQLite-compatible tool (e.g., DB Browser for SQLite, SQLite CLI, etc.).
+
 ---
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
