@@ -229,6 +229,15 @@ function Settings() {
               <li>The exported file can be opened with any SQLite-compatible tool</li>
               <li>Use this to backup your data or transfer it to another device</li>
             </ul>
+            <div className="mt-4 p-3 bg-muted rounded-md">
+              <h4 className="text-xs font-semibold mb-2">Technical Details</h4>
+              <p className="text-xs text-muted-foreground">
+                The export uses the SQLite WASM worker's export command, which serializes the database through the database connection. 
+                SQLite WASM uses the <code className="bg-background px-1 rounded">opfs-sahpool</code> VFS which stores data in a pooled structure 
+                with multiple internal files (not as a single .sqlite3 file), so direct file access via the Storage Manager API is not possible. 
+                The worker's export command properly handles the internal VFS structure and produces a valid, portable SQLite database file.
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
