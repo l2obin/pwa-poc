@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as DiagramRouteImport } from './routes/diagram'
+import { Route as ChatbotRouteImport } from './routes/chatbot'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -22,6 +23,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const DiagramRoute = DiagramRouteImport.update({
   id: '/diagram',
   path: '/diagram',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatbotRoute = ChatbotRouteImport.update({
+  id: '/chatbot',
+  path: '/chatbot',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -38,12 +44,14 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/chatbot': typeof ChatbotRoute
   '/diagram': typeof DiagramRoute
   '/settings': typeof SettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/chatbot': typeof ChatbotRoute
   '/diagram': typeof DiagramRoute
   '/settings': typeof SettingsRoute
 }
@@ -51,20 +59,22 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/chatbot': typeof ChatbotRoute
   '/diagram': typeof DiagramRoute
   '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/diagram' | '/settings'
+  fullPaths: '/' | '/about' | '/chatbot' | '/diagram' | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/diagram' | '/settings'
-  id: '__root__' | '/' | '/about' | '/diagram' | '/settings'
+  to: '/' | '/about' | '/chatbot' | '/diagram' | '/settings'
+  id: '__root__' | '/' | '/about' | '/chatbot' | '/diagram' | '/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  ChatbotRoute: typeof ChatbotRoute
   DiagramRoute: typeof DiagramRoute
   SettingsRoute: typeof SettingsRoute
 }
@@ -83,6 +93,13 @@ declare module '@tanstack/react-router' {
       path: '/diagram'
       fullPath: '/diagram'
       preLoaderRoute: typeof DiagramRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chatbot': {
+      id: '/chatbot'
+      path: '/chatbot'
+      fullPath: '/chatbot'
+      preLoaderRoute: typeof ChatbotRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -105,6 +122,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  ChatbotRoute: ChatbotRoute,
   DiagramRoute: DiagramRoute,
   SettingsRoute: SettingsRoute,
 }

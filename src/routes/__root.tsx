@@ -15,6 +15,10 @@ const NAV_ITEMS: NavItem[] = [
     href: '/diagram'
   },
   {
+    title: 'Chatbot',
+    href: '/chatbot'
+  },
+  {
     title: 'About',
     href: '/about'
   },
