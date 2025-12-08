@@ -29,23 +29,36 @@ function Chatbot() {
 
   // Check WebGPU support on mount
   useEffect(() => {
+    console.log('[Chatbot] Component mounted')
+    console.log('[Chatbot] Navigator info:', {
+      userAgent: navigator.userAgent,
+      platform: navigator.platform,
+      hasGPU: 'gpu' in navigator
+    })
+    
     const checkWebGPU = async () => {
+      console.log('[Chatbot] Checking WebGPU support...')
       if ('gpu' in navigator) {
         try {
           // Type assertion for WebGPU API which isn't in standard Navigator type yet
           const adapter = await (navigator as Navigator & { gpu: GPU }).gpu.requestAdapter()
+          console.log('[Chatbot] WebGPU adapter:', adapter ? 'Available' : 'Not available')
           setWebGPUSupported(!!adapter)
           if (!adapter) {
+            console.log('[Chatbot] WebGPU adapter not available, falling back to CPU')
             toast.warning('WebGPU adapter not available, using CPU')
             setUseWebGPU(false)
+          } else {
+            console.log('[Chatbot] WebGPU is supported and available')
           }
         } catch (error) {
-          console.error('WebGPU check failed:', error)
+          console.error('[Chatbot] WebGPU check failed:', error)
           setWebGPUSupported(false)
           setUseWebGPU(false)
           toast.warning('WebGPU not supported, using CPU')
         }
       } else {
+        console.log('[Chatbot] WebGPU API not found in navigator')
         setWebGPUSupported(false)
         setUseWebGPU(false)
         toast.warning('WebGPU not supported in this browser, using CPU')
@@ -57,18 +70,26 @@ function Chatbot() {
   // Initialize model when device changes or on first load
   const initializeModel = async (device: 'webgpu' | 'wasm') => {
     if (pipelineRef.current) {
+      console.log('[Chatbot] Cleaning up previous model instance')
       pipelineRef.current = null
       setModelLoaded(false)
     }
 
     setIsInitializing(true)
+    console.log(`[Chatbot] Starting model initialization with device: ${device}`)
+    
     try {
       toast.info(`Initializing model with ${device === 'webgpu' ? 'WebGPU' : 'CPU'}...`)
       
-      // Use a smaller model for better browser performance
-      // Qwen2.5-0.5B is a good lightweight option
-      const model = 'onnx-community/Qwen2.5-0.5B-Instruct'
+      // Use DistilGPT2 - a lightweight model optimized for text generation
+      // Much smaller than Qwen2.5 (~80MB vs ~200MB) and faster for browser use
+      const model = 'Xenova/distilgpt2'
       
+      console.log(`[Chatbot] Loading model: ${model}`)
+      console.log(`[Chatbot] Device: ${device}, dtype: fp32`)
+      console.log('[Chatbot] Starting pipeline creation...')
+      
+      const startTime = Date.now()
       pipelineRef.current = await pipeline(
         'text-generation',
         model,
@@ -77,32 +98,57 @@ function Chatbot() {
           dtype: 'fp32',
         }
       )
+      const loadTime = Date.now() - startTime
+      
+      console.log(`[Chatbot] Model loaded successfully in ${loadTime}ms`)
+      console.log('[Chatbot] Pipeline details:', {
+        model,
+        device,
+        loadTime,
+        timestamp: new Date().toISOString()
+      })
       
       setModelLoaded(true)
-      toast.success(`Model loaded successfully using ${device === 'webgpu' ? 'WebGPU' : 'CPU'}!`)
+      toast.success(`Model loaded successfully in ${(loadTime / 1000).toFixed(1)}s using ${device === 'webgpu' ? 'WebGPU' : 'CPU'}!`)
     } catch (error) {
-      console.error('Failed to load model:', error)
+      console.error('[Chatbot] Failed to load model')
+      console.error('[Chatbot] Error type:', typeof error)
+      console.error('[Chatbot] Error details:', error)
+      
+      // Log stack trace if available
+      if (error instanceof Error && error.stack) {
+        console.error('[Chatbot] Stack trace:', error.stack)
+      }
       
       // Provide more helpful error message
       let errorMessage = 'Unknown error'
       if (error instanceof Error) {
         errorMessage = error.message
+        console.error('[Chatbot] Error message:', errorMessage)
       } else if (typeof error === 'string') {
         errorMessage = error
+        console.error('[Chatbot] String error:', errorMessage)
       } else if (typeof error === 'number') {
         errorMessage = `Error code: ${error}. This may be due to corrupted cache or network issues. Try clearing browser cache or reloading.`
+        console.error('[Chatbot] Numeric error code:', error)
       } else if (error && typeof error === 'object') {
+        console.error('[Chatbot] Object error, attempting to serialize...')
         // Try to extract any useful error information, handling potential circular references
         try {
-          errorMessage = JSON.stringify(error).substring(0, 200)
-          if (JSON.stringify(error).length > 200) {
+          const serialized = JSON.stringify(error)
+          console.error('[Chatbot] Serialized error:', serialized)
+          errorMessage = serialized.substring(0, 200)
+          if (serialized.length > 200) {
             errorMessage += '...'
           }
         } catch {
           // If stringify fails (e.g., circular reference), fall back to toString
           errorMessage = `Error object: ${String(error)}`
+          console.error('[Chatbot] Could not serialize, using toString:', errorMessage)
         }
       }
+      
+      console.error('[Chatbot] Final error message for user:', errorMessage)
       
       toast.error(`Failed to load model: ${errorMessage}`, {
         duration: 10000, // Show error for 10 seconds
@@ -110,6 +156,7 @@ function Chatbot() {
       setModelLoaded(false)
     } finally {
       setIsInitializing(false)
+      console.log('[Chatbot] Model initialization completed')
     }
   }
 
@@ -132,13 +179,21 @@ function Chatbot() {
 
   // Send message
   const handleSend = async () => {
-    if (!input.trim() || !modelLoaded || isLoading) return
+    if (!input.trim() || !modelLoaded || isLoading) {
+      console.log('[Chatbot] Cannot send - conditions not met:', {
+        hasInput: !!input.trim(),
+        modelLoaded,
+        isLoading
+      })
+      return
+    }
 
     const userMessage: Message = {
       role: 'user',
       content: input.trim(),
     }
 
+    console.log('[Chatbot] Sending message:', userMessage.content)
     setMessages(prev => [...prev, userMessage])
     setInput('')
     setIsLoading(true)
@@ -153,6 +208,16 @@ function Chatbot() {
         ? `${conversationContext}\nUser: ${userMessage.content}\nAssistant:`
         : `User: ${userMessage.content}\nAssistant:`
 
+      console.log('[Chatbot] Generating response with prompt length:', prompt.length)
+      console.log('[Chatbot] Generation parameters:', {
+        max_new_tokens: 100,
+        do_sample: true,
+        temperature: 0.7,
+        top_k: 50,
+        top_p: 0.9,
+      })
+      
+      const startTime = Date.now()
       const output = await pipelineRef.current(prompt, {
         max_new_tokens: 100,
         do_sample: true,
@@ -160,19 +225,28 @@ function Chatbot() {
         top_k: 50,
         top_p: 0.9,
       })
+      const inferenceTime = Date.now() - startTime
+      
+      console.log('[Chatbot] Response generated in', inferenceTime, 'ms')
+      console.log('[Chatbot] Raw output:', output)
 
       let responseText = output[0].generated_text
+      console.log('[Chatbot] Generated text length:', responseText.length)
       
       // Extract only the assistant's response
       if (responseText.includes('Assistant:')) {
         const parts = responseText.split('Assistant:')
         responseText = parts[parts.length - 1].trim()
+        console.log('[Chatbot] Extracted assistant response after split')
       }
       
       // Remove the prompt from the response if it's included
       if (responseText.startsWith(prompt)) {
         responseText = responseText.slice(prompt.length).trim()
+        console.log('[Chatbot] Removed prompt from response')
       }
+
+      console.log('[Chatbot] Final response text:', responseText)
 
       const assistantMessage: Message = {
         role: 'assistant',
@@ -180,8 +254,16 @@ function Chatbot() {
       }
 
       setMessages(prev => [...prev, assistantMessage])
+      console.log('[Chatbot] Message added to conversation')
     } catch (error) {
-      console.error('Error generating response:', error)
+      console.error('[Chatbot] Error generating response')
+      console.error('[Chatbot] Error type:', typeof error)
+      console.error('[Chatbot] Error details:', error)
+      
+      if (error instanceof Error && error.stack) {
+        console.error('[Chatbot] Stack trace:', error.stack)
+      }
+      
       toast.error('Failed to generate response')
       const errorMessage: Message = {
         role: 'assistant',
@@ -190,6 +272,7 @@ function Chatbot() {
       setMessages(prev => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
+      console.log('[Chatbot] Message sending completed')
     }
   }
 
@@ -203,7 +286,7 @@ function Chatbot() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">AI Chatbot</h1>
         <p className="text-muted-foreground">
-          Chat with a lightweight LLM running locally in your browser
+          Chat with DistilGPT2, a lightweight LLM running locally in your browser
         </p>
       </div>
 
