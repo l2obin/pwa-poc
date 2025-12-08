@@ -82,7 +82,23 @@ function Chatbot() {
       toast.success(`Model loaded successfully using ${device === 'webgpu' ? 'WebGPU' : 'CPU'}!`)
     } catch (error) {
       console.error('Failed to load model:', error)
-      toast.error(`Failed to load model: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      
+      // Provide more helpful error message
+      let errorMessage = 'Unknown error'
+      if (error instanceof Error) {
+        errorMessage = error.message
+      } else if (typeof error === 'string') {
+        errorMessage = error
+      } else if (typeof error === 'number') {
+        errorMessage = `Error code: ${error}. This may be due to corrupted cache or network issues. Try clearing browser cache or reloading.`
+      } else if (error && typeof error === 'object') {
+        // Try to extract any useful error information
+        errorMessage = JSON.stringify(error).substring(0, 200)
+      }
+      
+      toast.error(`Failed to load model: ${errorMessage}`, {
+        duration: 10000, // Show error for 10 seconds
+      })
       setModelLoaded(false)
     } finally {
       setIsInitializing(false)
@@ -235,9 +251,14 @@ function Chatbot() {
           </div>
 
           {isInitializing && (
-            <p className="text-sm text-muted-foreground">
-              This may take a minute on first load as the model is downloaded...
-            </p>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">
+                This may take a minute on first load as the model is downloaded...
+              </p>
+              <p className="text-xs text-muted-foreground">
+                If loading fails, try refreshing the page or clearing your browser cache.
+              </p>
+            </div>
           )}
 
           {modelLoaded && (
