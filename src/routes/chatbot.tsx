@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Card } from '@/components/ui/card'
+import { Select } from '@/components/ui/select'
 import { pipeline, TextGenerationPipeline } from '@huggingface/transformers'
 import { toast } from 'sonner'
 
@@ -16,6 +17,40 @@ interface Message {
   content: string
 }
 
+// Top 5 popular lightweight LLM models for browser use
+const AVAILABLE_MODELS = [
+  {
+    id: 'Xenova/distilgpt2',
+    name: 'DistilGPT2',
+    description: 'Fast and lightweight (~80MB)',
+    size: '~80MB'
+  },
+  {
+    id: 'Xenova/gpt2',
+    name: 'GPT-2',
+    description: 'Good quality, moderate size (~500MB)',
+    size: '~500MB'
+  },
+  {
+    id: 'Xenova/LaMini-Flan-T5-783M',
+    name: 'LaMini-Flan-T5',
+    description: 'Instruction-tuned, good reasoning (~783MB)',
+    size: '~783MB'
+  },
+  {
+    id: 'Xenova/TinyLlama-1.1B-Chat-v1.0',
+    name: 'TinyLlama Chat',
+    description: 'Small Llama variant (~600MB)',
+    size: '~600MB'
+  },
+  {
+    id: 'onnx-community/Qwen2.5-0.5B-Instruct',
+    name: 'Qwen2.5-0.5B',
+    description: 'Compact instruct model (~200MB)',
+    size: '~200MB'
+  }
+] as const
+
 function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -24,6 +59,7 @@ function Chatbot() {
   const [useWebGPU, setUseWebGPU] = useState(true)
   const [webGPUSupported, setWebGPUSupported] = useState<boolean | null>(null)
   const [modelLoaded, setModelLoaded] = useState(false)
+  const [selectedModel, setSelectedModel] = useState(AVAILABLE_MODELS[0].id)
   const pipelineRef = useRef<TextGenerationPipeline | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
@@ -79,13 +115,13 @@ function Chatbot() {
     console.log(`[Chatbot] Starting model initialization with device: ${device}`)
     
     try {
-      toast.info(`Initializing model with ${device === 'webgpu' ? 'WebGPU' : 'CPU'}...`)
+      toast.info(`Initializing ${AVAILABLE_MODELS.find(m => m.id === selectedModel)?.name} with ${device === 'webgpu' ? 'WebGPU' : 'CPU'}...`)
       
-      // Use DistilGPT2 - a lightweight model optimized for text generation
-      // Much smaller than Qwen2.5 (~80MB vs ~200MB) and faster for browser use
-      const model = 'Xenova/distilgpt2'
+      const modelInfo = AVAILABLE_MODELS.find(m => m.id === selectedModel)
+      const model = selectedModel
       
       console.log(`[Chatbot] Loading model: ${model}`)
+      console.log(`[Chatbot] Model info:`, modelInfo)
       console.log(`[Chatbot] Device: ${device}, dtype: fp32`)
       console.log('[Chatbot] Starting pipeline creation...')
       
@@ -169,6 +205,22 @@ function Chatbot() {
     setUseWebGPU(checked)
     setModelLoaded(false)
     pipelineRef.current = null
+  }
+
+  // Handle model selection change
+  const handleModelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const newModel = event.target.value
+    console.log('[Chatbot] Model selection changed:', newModel)
+    setSelectedModel(newModel)
+    
+    // If a model is currently loaded, unload it
+    if (modelLoaded) {
+      console.log('[Chatbot] Unloading current model due to selection change')
+      setModelLoaded(false)
+      pipelineRef.current = null
+      setMessages([])
+      toast.info('Model changed. Please load the new model.')
+    }
   }
 
   // Load model button handler
@@ -286,13 +338,36 @@ function Chatbot() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">AI Chatbot</h1>
         <p className="text-muted-foreground">
-          Chat with DistilGPT2, a lightweight LLM running locally in your browser
+          Chat with a lightweight LLM running locally in your browser
         </p>
       </div>
 
       {/* Model Configuration */}
       <Card className="p-6 mb-6">
         <div className="space-y-4">
+          {/* Model Selection Dropdown */}
+          <div className="space-y-2">
+            <Label htmlFor="model-select" className="text-base font-medium">
+              Select Model
+            </Label>
+            <Select
+              id="model-select"
+              value={selectedModel}
+              onChange={handleModelChange}
+              disabled={isInitializing}
+              className="w-full"
+            >
+              {AVAILABLE_MODELS.map((model) => (
+                <option key={model.id} value={model.id}>
+                  {model.name} - {model.description} ({model.size})
+                </option>
+              ))}
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Choose from top 5 popular lightweight models optimized for browser use
+            </p>
+          </div>
+
           <div className="flex items-center justify-between">
             <div className="space-y-1">
               <Label htmlFor="webgpu-toggle" className="text-base font-medium">
