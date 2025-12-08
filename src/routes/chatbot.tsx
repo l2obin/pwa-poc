@@ -11,9 +11,6 @@ export const Route = createFileRoute('/chatbot')({
   component: Chatbot,
 })
 
-// Configure transformers.js
-env.allowLocalModels = false
-
 interface Message {
   role: 'user' | 'assistant'
   content: string
@@ -77,7 +74,7 @@ function Chatbot() {
         model,
         { 
           device,
-          dtype: device === 'webgpu' ? 'fp32' : 'fp32',
+          dtype: 'fp32',
         }
       )
       
@@ -302,7 +299,7 @@ function Chatbot() {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && handleSend()}
+          onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder={
             !modelLoaded
               ? 'Load the model first...'

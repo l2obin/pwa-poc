@@ -58,7 +58,7 @@ export default defineConfig({
         // defining cached files formats
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webmanifest,wasm}"],
         // Increase maximum file size for large WASM files from transformers.js
-        maximumFileSizeToCacheInBytes: 30 * 1024 * 1024, // 30 MB
+        maximumFileSizeToCacheInBytes: 30 * 1024 * 1024, // 30 MiB
       }
     }),
     // mkcert()
