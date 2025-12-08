@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Card } from '@/components/ui/card'
-import { pipeline, env } from '@huggingface/transformers'
+import { pipeline, env, TextGenerationPipeline } from '@huggingface/transformers'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/chatbot')({
@@ -27,7 +27,7 @@ function Chatbot() {
   const [useWebGPU, setUseWebGPU] = useState(true)
   const [webGPUSupported, setWebGPUSupported] = useState<boolean | null>(null)
   const [modelLoaded, setModelLoaded] = useState(false)
-  const pipelineRef = useRef<any>(null)
+  const pipelineRef = useRef<TextGenerationPipeline | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // Check WebGPU support on mount
@@ -35,7 +35,8 @@ function Chatbot() {
     const checkWebGPU = async () => {
       if ('gpu' in navigator) {
         try {
-          const adapter = await (navigator as any).gpu.requestAdapter()
+          // Type assertion for WebGPU API which isn't in standard Navigator type yet
+          const adapter = await (navigator as Navigator & { gpu: GPU }).gpu.requestAdapter()
           setWebGPUSupported(!!adapter)
           if (!adapter) {
             toast.warning('WebGPU adapter not available, using CPU')
