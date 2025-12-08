@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { Card } from '@/components/ui/card'
-import { pipeline, env, TextGenerationPipeline } from '@huggingface/transformers'
+import { pipeline, TextGenerationPipeline } from '@huggingface/transformers'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/chatbot')({
@@ -92,8 +92,16 @@ function Chatbot() {
       } else if (typeof error === 'number') {
         errorMessage = `Error code: ${error}. This may be due to corrupted cache or network issues. Try clearing browser cache or reloading.`
       } else if (error && typeof error === 'object') {
-        // Try to extract any useful error information
-        errorMessage = JSON.stringify(error).substring(0, 200)
+        // Try to extract any useful error information, handling potential circular references
+        try {
+          errorMessage = JSON.stringify(error).substring(0, 200)
+          if (JSON.stringify(error).length > 200) {
+            errorMessage += '...'
+          }
+        } catch {
+          // If stringify fails (e.g., circular reference), fall back to toString
+          errorMessage = `Error object: ${String(error)}`
+        }
       }
       
       toast.error(`Failed to load model: ${errorMessage}`, {
